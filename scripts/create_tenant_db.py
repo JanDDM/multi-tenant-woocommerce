@@ -1,5 +1,7 @@
 import mysql.connector
 import os, yaml, subprocess
+import secrets
+import string
 
 # --------------------------
 # DB Connection

@@ -1,17 +1,17 @@
-tenant:
-  name: tenant-01
-  domain: shop1.genoras.com
-  location: EMEA
+database:
+  host: mysql.db.svc.cluster.local
+  name: tenant_1
+  password: ziXAEILg5gXD4jEI
+  user: tenant_1_user
+plugins: '["woocommerce-core"]'
+preferences: '{"language": "en"}'
 resources:
   limits:
     cpu: '1'
     memory: 2Gi
   requests:
     storage: 20Gi
-database:
-  host: mysql.db.svc.cluster.local
-  name: null
-  user: null
-  password: null
-plugins: '["woocommerce-core"]'
-preferences: '{"language": "en"}'
+tenant:
+  domain: shop1.genoras.com
+  location: EMEA
+  name: tenant-01
