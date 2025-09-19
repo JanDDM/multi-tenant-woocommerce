@@ -12,54 +12,35 @@ db = mysql.connector.connect(
 )
 cursor = db.cursor(dictionary=True)
 
-# --------------------------
-# Fetch tenants + plan configs
-# --------------------------
-cursor.execute("""
-    SELECT t.*, p.cpu, p.memory, p.storage, p.plugins, t.features
-    FROM tenants t
-    JOIN plans p ON t.plan_id = p.plan_id
-""")
-tenants = cursor.fetchall()
 
-# --------------------------
-# Generate values.yaml for each tenant
-# --------------------------
-for tenant in tenants:
-    values = {
-        "tenant": {
-            "name": tenant["tenant_name"],
-            "domain": tenant["domain"],
-            "location": tenant["location"]
-        },
-        "resources": {
-            "limits": {
-                "cpu": tenant["cpu"],
-                "memory": tenant["memory"]
-            },
-            "requests": {
-                "storage": tenant["storage"]
-            }
-        },
-        "database": {
-            "host": "mysql.db.svc.cluster.local",
-            "name": tenant["db_name"],
-            "user": tenant["db_user"],
-            "password": tenant["db_password"]
-        },
-        "plugins": tenant["plugins"],
-        "preferences": tenant.get("preferences", {})
-    }
+# Fetch tenants with no DB assigned yet
+cursor.execute("SELECT * FROM tenants WHERE db_name IS NULL")
+new_tenants = cursor.fetchall()
 
-    # Write tenant values.yaml
-    tenant_dir = f"tenants/{tenant['tenant_name']}"
-    os.makedirs(tenant_dir, exist_ok=True)
-    with open(f"{tenant_dir}/values.yaml", "w") as f:
-        yaml.dump(values, f, sort_keys=False)
+for tenant in new_tenants:
+    tenant_id = tenant["tenant_id"]
 
-# --------------------------
-# Commit + push to GitHub
-# --------------------------
-subprocess.run(["git", "add", "."], check=True)
-subprocess.run(["git", "commit", "-m", "Update tenant configs"], check=True)
-subprocess.run(["git", "push"], check=True)
+    # Generate DB name, user, and password
+    db_name = f"tenant_{tenant_id}"
+    db_user = f"tenant_{tenant_id}_user"
+    db_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for i in range(16))
+
+    # Create DB and user in MySQL
+    admin = db.cursor()
+    admin.execute(f"CREATE DATABASE {db_name};")
+    admin.execute(f"CREATE USER '{db_user}'@'%' IDENTIFIED BY '{db_password}';")
+    admin.execute(f"GRANT ALL PRIVILEGES ON {db_name}.* TO '{db_user}'@'%';")
+    admin.execute("FLUSH PRIVILEGES;")
+
+    # Save back to tenants table
+    cursor.execute("""
+        UPDATE tenants 
+        SET db_name=%s, db_user=%s, db_password=%s 
+        WHERE tenant_id=%s
+    """, (db_name, db_user, db_password, tenant_id))
+    db.commit()
+
+    print(f"✅ Created DB for tenant {tenant['tenant_name']} -> {db_name}")
+
+cursor.close()
+db.close()
