@@ -1,0 +1,21 @@
+client:
+  name: default-client
+  domain: ""
+
+mysql:
+  rootPassword: "Genoras_20@25!/"
+  storage: 5Gi
+
+wordpress:
+  storage: 10Gi
+
+nginx:
+  serverName: "_"
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"

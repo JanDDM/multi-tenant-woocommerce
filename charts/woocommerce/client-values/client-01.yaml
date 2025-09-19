@@ -1,0 +1,24 @@
+clientName: client-01
+ingress:
+  host: client-01.91-98-13-195.nip.io
+
+wordpress:
+  storage: 10Gi
+  dbHost: client-01-mysql.waas-clients.svc.cluster.local:3306
+  dbName: wp_client_01
+  dbUser: user_client_01
+  dbPassword: Genoras_20@25!/
+  extraEnv:
+    - name: WORDPRESS_SITEURL
+      value: "http://client-01.91-98-13-195.nip.io"
+    - name: WORDPRESS_HOME
+      value: "http://client-01.91-98-13-195.nip.io"
+
+mysql:
+  enabled: true
+  architecture: standalone
+  storage: 5Gi
+  rootPassword: Genoras_20@25!/
+  database: wp_client_01
+  user: user_client_01
+  password: Genoras_20@25!/

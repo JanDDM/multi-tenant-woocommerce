@@ -1,0 +1,17 @@
+{{- if .Values.nginx.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-nginx-config
+  namespace: {{ .Release.Namespace }}
+data:
+  default.conf: |
+    server {
+      listen 80;
+      server_name {{ .Values.client.domain }};
+      location / {
+        proxy_pass http://{{ .Release.Name }}-wp:80;
+      }
+    }
+{{- end }}
+

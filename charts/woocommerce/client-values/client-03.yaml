@@ -1,0 +1,19 @@
+clientName: client-03
+ingress:
+  host: client-03.91-98-13-195.nip.io
+
+wordpress:
+  storage: 10Gi
+  # 👇 Always set correct DB connection
+  dbHost: client-03-mysql.waas-clients.svc.cluster.local:3306
+  dbName: wordpress
+  dbUser: ddm_wordpress
+  dbPassword: Genoras_20@25!/
+
+mysql:
+  storage: 5Gi
+  # 👇 Ensure MySQL is always initialized with same creds
+  rootPassword: Genoras_20@25!/
+  database: wordpress
+  user: ddm_wordpress
+  password: Genoras_20@25!/

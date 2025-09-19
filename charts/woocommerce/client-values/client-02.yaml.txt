@@ -1,0 +1,18 @@
+namespace: client-02
+
+mysql:
+  rootPassword: "Client02@Secure"
+  database: wordpress
+  user: client02_user
+  password: "Client02@Secure"
+  storage: 10Gi
+
+wordpress:
+  dbHost: 127.0.0.1:3306
+  dbName: wordpress
+  dbUser: client02_user
+  dbPassword: "Client02@Secure"
+  storage: 15Gi
+
+nginx:
+  serverName: client-02.genoras.com
