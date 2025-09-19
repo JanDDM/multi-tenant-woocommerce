@@ -5,7 +5,7 @@ import os, yaml, subprocess
 # DB Connection
 # --------------------------
 db = mysql.connector.connect(
-    host="mysql.db.svc.cluster.local",
+    host="localhost",
     user="root",
     password="Genoras_20@25!/",
     database="platform_config"
